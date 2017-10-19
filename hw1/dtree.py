@@ -90,12 +90,9 @@ def DecisionTree(data, pre_classlist = None, attrs = None):
         types = AttrClassCount(data, target)
         subset = {}
         for key in types:
-            subset[key] = [row for row in data if row[target] == key]
-        del data
-        for key in types:
-            theTree[target][key] = DecisionTree(subset[key], classlist, attrs-{target})
+            subset = [row for row in data if row[target] == key]
+            theTree[target][key] = DecisionTree(subset, classlist, attrs-{target})
     return theTree
-
 
 def Predict(tree, row):
     if type(tree) == str:
