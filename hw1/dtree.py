@@ -110,3 +110,36 @@ def Predict(tree, row):
             for key in tree[index]:
                 if row[index] == key:
                    return Predict(tree[index][key],row)
+
+def Score(tree, labels, test):
+    tp = {}
+    fn = {}
+    fp = {}
+
+    for key in labels:
+        tp[key], fn[key], fp[key] = 0, 0, 0
+
+    for row in test:
+        predict = Predict(tree, row)
+        if row[-1] == predict:
+            tp[predict] += 1
+        else:
+            fn[row[-1]] += 1
+            fp[predict] += 1
+
+    precision = {}
+    recall = {}
+    accuracy = sum(tp.values()) / len(test)
+    for index in labels:
+        precision[index] = tp[index] / (tp[index] + fn[index])
+        recall[index] =  tp[index] / (tp[index] + fp[index])
+
+    #return {'accuracy':accuracy, 'precision':precision , 'recall':recall}
+    return accuracy, precision , recall
+
+ 
+
+
+
+
+

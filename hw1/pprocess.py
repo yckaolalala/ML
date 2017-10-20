@@ -1,3 +1,5 @@
+import random
+
 def Value(line):
     row = []
     for x in line:
@@ -11,12 +13,21 @@ def Load(filename):
     with open(filename,'r') as load_file:
         data = load_file.read().split('\n')        
     
-#    classification = { 'Iris-setosa':'0', 'Iris-versicolor':'1', 'Iris-virginica':'2' }
     result = []
     for line in data:
         row = Value(line.split(','))
- #       for i,j in classification.items():
- #           row[-1] = row[-1].replace(i, j)
         result.append(row)
 
     return result[:-1]
+
+def Kfold(data, k):
+    n = len(data)
+    size = n//k
+    index = [i for i in range(n)]
+    random.shuffle(data)
+    subdata = []
+    for i in range(k):
+        subdata.append(data[i*size:(i+1)*size])
+    return subdata
+        
+        
