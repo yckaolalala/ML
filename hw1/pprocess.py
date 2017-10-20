@@ -20,14 +20,27 @@ def Load(filename):
 
     return result[:-1]
 
+def Normalize(data):
+    for index in range(len(data[0])-1):
+        if type(data[0][index]) in (int, float): 
+            col = [x[index] for x in data]
+            maximal = max(col)
+            minimal = min(col)
+            for row in range(len(data)):
+                data[row][index] = (data[row][index] - minimal)/(maximal - minimal)
+            
+    return data
+        
+
 def Kfold(data, k):
     n = len(data)
     size = n//k
     index = [i for i in range(n)]
     random.shuffle(data)
     subdata = []
-    for i in range(k):
+    for i in range(k-1):
         subdata.append(data[i*size:(i+1)*size])
+    subdata.append(data[(i+1)*size:n])
     return subdata
         
         
