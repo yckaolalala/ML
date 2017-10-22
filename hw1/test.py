@@ -1,12 +1,9 @@
 import pprocess as pp
 import dtree as dt
-import json
 
-#data = pp.Load("./sample.data")
 data = pp.Load("./iris.data")
 
 k = 5
-data = pp.Normalize(data)
 kfold = pp.Kfold(data, k)
 score = {'accuracy':0.0, 'recall':{}, 'precision':{}}
 labels = []
@@ -26,7 +23,6 @@ for i in range(k):
             train.extend(kfold[j])
     tree = dt.DecisionTree(train)
     accuracy, precision, recall = dt.Score(tree, labels, test)
-    
     score['accuracy'] += accuracy
     for key in precision:
         score['precision'][key] += precision[key]    

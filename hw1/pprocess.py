@@ -28,14 +28,12 @@ def Normalize(data):
             minimal = min(col)
             for row in range(len(data)):
                 data[row][index] = (data[row][index] - minimal)/(maximal - minimal)
-            
     return data
         
 
 def Kfold(data, k):
     n = len(data)
     size = n//k
-    index = [i for i in range(n)]
     random.shuffle(data)
     subdata = []
     for i in range(k-1):

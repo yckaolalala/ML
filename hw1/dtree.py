@@ -23,7 +23,7 @@ def Entropy(data):
 def InfoGain(data, index):
     n = len(data)
     boundary = 0
-    entropy = Entropy(data) 
+    entropy = Entropy(data)
     sort = sorted(data, key=operator.itemgetter(index)) 
     #continuous variable
     if type(data[0][index]) in (float, int):
@@ -45,7 +45,6 @@ def InfoGain(data, index):
         infogain = entropy - rem
     return infogain, boundary
 
-
 def BestFeature(data, attrs):
     entropy = Entropy(data) 
     target, infogain, boundry = -1, 0.0, 0.0
@@ -60,16 +59,13 @@ def DecisionTree(data, pre_classlist = None, attrs = None):
         attrs = set()
         for i in range(len(data[0])-1):
             attrs.add(i)
-        
     classlist = [ex[-1] for ex in data]
-
     # majority of parent
     if len(data) == 0:
         return max(pre_classlist)
     # single label
     if classlist.count(classlist[0]) == len(classlist):
         return classlist[0]
-
     # only label
     if len(attrs) == 0: 
         return max(classlist)
@@ -88,7 +84,6 @@ def DecisionTree(data, pre_classlist = None, attrs = None):
     # discrete variable
     else:
         types = AttrClassCount(data, target)
-        subset = {}
         for key in types:
             subset = [row for row in data if row[target] == key]
             theTree[target][key] = DecisionTree(subset, classlist, attrs-{target})
@@ -97,21 +92,18 @@ def DecisionTree(data, pre_classlist = None, attrs = None):
 def Predict(tree, row):
     if type(tree) == str:
         return tree
-    
     for index in tree:
-        if type(row[index]) in (float, int):
-            for key in tree[index]:
-                value = key.split(' ')
-            if row[index] >= float(value[1]):
+        for key in tree[index]:
+            value = key.split(' ')
+            if value[0] == '+' or value[0] == '-':
+                if row[index] >= float(value[1]):
                     return Predict(tree[index]["+ "+value[1]],row)
-            else:
+                else:
                     return Predict(tree[index]["- "+value[1]],row)
-        else:
-            for key in tree[index]:
-                if row[index] == key:
+            else:
+                 if row[index] == key:
                     return Predict(tree[index][key],row)
-            #print ("not found")
-            return Predict(tree[index][key],row)
+        return Predict(tree[index][key],row)
 
 def Score(tree, labels, test):
     tp = {}
@@ -130,19 +122,10 @@ def Score(tree, labels, test):
         else:
             fn[row[-1]] += 1
             fp[predict] += 1
-
     precision = {}
     recall = {}
-    accuracy = sum(tp.values()) / len(test)
+    accuracy = float(sum(tp.values())) / len(test)
     for index in target:
-        precision[index] = 1 if fp[index] == 0 else tp[index] / (tp[index] + fp[index])
-        recall[index] = 1 if fn[index] == 0 else tp[index] / (tp[index] + fn[index])
-
+        precision[index] = 1 if fp[index] == 0 else float(tp[index]) / (tp[index] + fp[index])
+        recall[index] = 1 if fn[index] == 0 else float(tp[index]) / (tp[index] + fn[index])
     return accuracy, precision , recall
-
- 
-
-
-
-
-
