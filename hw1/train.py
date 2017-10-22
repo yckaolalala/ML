@@ -1,9 +1,9 @@
-import pprocess as pp
-from model_selection import cross_val_score 
+from pprocess import Load
+from model_selection import Cross_val_score 
 
-data = pp.Load("./iris.data")
+data = Load("./iris.data")
 
-score = cross_val_score(data, model = 'dt', k = 5)
+score = Cross_val_score(data, model = 'dt', k = 5)
 
 print ("%f"%(score['accuracy']))
 for key in score['recall']:

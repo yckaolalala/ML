@@ -11,7 +11,7 @@ def Kfold(data, k):
       subdata.append(data[(i+1)*size:n])
       return subdata
 
-def cross_val_score(data, model, k):
+def Cross_val_score(data, model, k):
     kfold = Kfold(data, k)
     score = {'accuracy':0.0, 'recall':{}, 'precision':{}}
     count = {}
