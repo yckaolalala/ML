@@ -1,5 +1,3 @@
-import random
-
 def Value(line):
     row = []
     for x in line:
@@ -29,16 +27,3 @@ def Normalize(data):
             for row in range(len(data)):
                 data[row][index] = (data[row][index] - minimal)/(maximal - minimal)
     return data
-        
-
-def Kfold(data, k):
-    n = len(data)
-    size = n//k
-    random.shuffle(data)
-    subdata = []
-    for i in range(k-1):
-        subdata.append(data[i*size:(i+1)*size])
-    subdata.append(data[(i+1)*size:n])
-    return subdata
-        
-        
