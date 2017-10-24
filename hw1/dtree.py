@@ -1,5 +1,6 @@
 from math import log
 import operator
+import random
 
 #each class number of attribute
 def AttrClassCount(data, index):
@@ -89,7 +90,28 @@ def DecisionTree(data, pre_classlist = None, attrs = None):
             theTree[target][key] = DecisionTree(subset, classlist, attrs-{target})
     return theTree
 
-def Predict(tree, row):
+def RandomForest(data, features, num):
+    attrs = set()
+    for i in range(len(data[0])-1):
+        attrs.add(i)
+    group = [[]]
+    feature = []
+    forest = []
+    for number in attrs:        
+        group += [[number] + element for element in group]
+    for subset in group:
+        if len(subset) == features:
+            feature.append(subset)
+    for i in range(num):
+        train = []
+        for j in range(len(data)):
+            index = random.randint(0, len(data)-1)
+            train.append(data[index])
+        tree = DecisionTree(train, attrs = set(feature[i%len(feature)]))
+        forest.append(tree)
+    return forest
+
+def Predict_dt(tree, row):
     if type(tree) == str:
         return tree
     for index in tree:
@@ -97,15 +119,31 @@ def Predict(tree, row):
             value = key.split(' ')
             if value[0] == '+' or value[0] == '-':
                 if row[index] >= float(value[1]):
-                    return Predict(tree[index]["+ "+value[1]],row)
+                    return Predict_dt(tree[index]["+ "+value[1]],row)
                 else:
-                    return Predict(tree[index]["- "+value[1]],row)
+                    return Predict_dt(tree[index]["- "+value[1]],row)
             else:
                  if row[index] == key:
-                    return Predict(tree[index][key],row)
+                    return Predict_dt(tree[index][key],row)
         return Predict(tree[index][key],row)
 
-def Score(tree, labels, test):
+def Predict_rf(forest, row):
+    result = {}
+    for tree in forest:
+        predict = Predict_dt(tree, row)
+        if predict not in result.keys():
+            result[predict] = 0
+        result[predict] += 1
+    return max(result, key = result.get)
+
+def Predict(tree, row, model):
+    if model == 'rf':
+        return Predict_rf(tree, row)
+    elif model == 'dt':
+        return Predict_dt(tree, row)
+    
+
+def Score(tree, labels, test, model = None):
     tp = {}
     fn = {}
     fp = {}
@@ -116,7 +154,7 @@ def Score(tree, labels, test):
     for key in labels:
         tp[key], fn[key], fp[key] = 0, 0, 0
     for row in test:
-        predict = Predict(tree, row)
+        predict = Predict(tree, row, model)
         if row[-1] == predict:
             tp[predict] += 1
         else:

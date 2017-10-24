@@ -29,8 +29,11 @@ def Cross_val_score(data, model, k):
         for j in range(k):
             if i != j:
                 train.extend(kfold[j])
-        tree = dt.DecisionTree(train)
-        accuracy, precision, recall = dt.Score(tree, labels, test)
+        if model == 'rf':
+            tree = dt.RandomForest(train, features = 3, num = 10)
+        else:
+            tree = dt.DecisionTree(train)
+        accuracy, precision, recall = dt.Score(tree, labels, test, model)
         score['accuracy'] += accuracy
         for key in precision:
             score['precision'][key] += precision[key]    
