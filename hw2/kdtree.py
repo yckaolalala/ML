@@ -2,7 +2,6 @@ import operator
 
 class Node(object):
     def _init_(self):
-        self.parent = None
         self.left = None
         self.right = None
         self.split = None
@@ -32,6 +31,12 @@ def Get_middle(data, attribute):
     middle = (n+1)/2 if n % 2 == 1 else n/2
     return sort[int(middle)-1]
 
+def get_next_attribute(attribute):
+    if attribute == 9:
+        return 1
+    else:
+        return int(attribute) + 1
+
 def Build_kdtree(data):
     
     if len(data) == 0:
@@ -55,36 +60,56 @@ def Build_kdtree(data):
                     subdata1.append(row)
                 else:
                     subdata2.append(row)
-
         node.left = Build_kdtree(subdata1)
         node.right = Build_kdtree(subdata2)
-        if node.left != None:
-            node.left.parent = node            
-        if node.right != None:
-            node.right.parent = node            
-
     return node
 
-def Search(cur, pre, row):
-    if cur == None:
-        return pre
-    
-    #if cur.left is None and cur.right is None: 
-    if cur.split == -1:
-        return cur
+def Distance(p, q):
+    count = 0
+    for index in range(2,len(p)-1):# fixed in this assignment data
+        dis= float(p[index])-float(q[index])
+        count += dis*dis
+    return count**0.5
 
-    print (cur.data)
-    print (cur.split)
-       
-    if cur.data[cur.split] < row[cur.split]:
-        print ("left")
-        if cur.left != None:
-            return Search(cur.left, cur, row)
-    else:
-        print ("right")
-        if cur.right != None:
-            return Search(cur.right, cur, row)
-    
-def Nearest(root, row, minDis = 0):
-    print(Search(root, root, row))
-    return None
+def Nearest(root, row):
+    if root == None:
+        return
+    trace = []
+    cur = root
+    while cur != None and cur.split != -1:
+        if cur.data[cur.split] < row[cur.split]:
+            if cur.left != None:
+                trace.append([cur,'l'])
+                cur = cur.left
+            else:
+                trace.append([cur,'r'])
+                cur = cur.right
+        else:
+            if cur.right != None:
+                trace.append([cur,'r'])
+                cur = cur.right
+            else:
+                trace.append([cur,'l'])
+                cur = cur.left
+
+    minDis = Distance(row, cur.data)
+    for i  in trace:
+        if abs(float(row[i[0].split]) - float(i[0].data[i[0].split])) < minDis:
+            if Distance(row, i[0].data) < minDis:
+                minDis = Distance(row, i[0].data)
+                cur = i[0]
+
+            tmp = i[0]
+            if i[1] == 'l':
+                if i[0].right != None:
+                    tmp = Nearest(i[0].right, row)
+            else:
+                if i[0].left != None:
+                    tmp = Nearest(i[0].left, row)
+            if Distance(row, tmp.data) < minDis:
+                minDis = Distance(row, tmp.data)
+                cur = tmp
+
+    return cur
+
+
