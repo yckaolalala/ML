@@ -77,6 +77,8 @@ def Nearest(root, row):
     trace = []
     cur = root
     while cur != None and cur.split != -1:
+        print(cur.data)
+
         if cur.data[cur.split] < row[cur.split]:
             if cur.left != None:
                 trace.append([cur,'l'])
@@ -109,7 +111,81 @@ def Nearest(root, row):
             if Distance(row, tmp.data) < minDis:
                 minDis = Distance(row, tmp.data)
                 cur = tmp
-
     return cur
 
+def pushlist(kmin, data, row, k):
+    maxDis = 0
+    maxpoint = []
+    for i in kmin:
+        if data == i:
+            return
+    if len(kmin) < k:
+        kmin.append(data)
+    else:       
+        for i in kmin:
+            if Distance(i, row) > maxDis:
+                maxDis = Distance(i, row)
+                maxpoint = i
+        if maxDis > Distance(data, row):
+            kmin.remove(maxpoint)
+            kmin.append(data)            
+
+def get_Min(kmin, row, k):
+    if len(kmin) < k:
+        minDis = 100000000
+    else:
+        minDis = 0
+        for i in kmin:
+            if Distance(i, row) > minDis:
+                minDis = Distance(i, row)
+    return minDis
+
+def Knn(root, row , k, kmin = []):
+    if root == None:
+        return
+    k = 10 if k < 10 else k
+    trace = []
+    cur = root
+    while cur != None and cur.split != -1:
+        if cur.data[cur.split] < row[cur.split]:
+            if cur.left != None:
+                trace.append([cur,'l'])
+                cur = cur.left
+            else:
+                trace.append([cur,'r'])
+                cur = cur.right
+        else:
+            if cur.right != None:
+                trace.append([cur,'r'])
+                cur = cur.right
+            else:
+                trace.append([cur,'l'])
+                cur = cur.left
+    for i in trace:
+        pushlist(kmin, i[0].data, row, k)
+
+    minDis = get_Min(kmin, row, k)
+    
+    for i  in trace:
+        if abs(float(row[i[0].split]) - float(i[0].data[i[0].split])) < minDis:
+            if Distance(row, i[0].data) < minDis:
+                #minDis = Distance(row, i[0].data)
+                pushlist(kmin, i[0].data, row , k)
+                minDis = get_Min(kmin, row, k)
+                cur = i[0]
+
+            tmp = i[0]
+            if i[1] == 'l':
+                if i[0].right != None:
+                    tmp = Knn(i[0].right, row, k, kmin)
+            else:
+                if i[0].left != None:
+                    tmp = Knn(i[0].left, row, k, kmin)
+            if Distance(row, tmp.data) < minDis:
+                pushlist(kmin, tmp.data, row , k)
+                minDis = get_Min(kmin, row, k)
+                #minDis = Distance(row, tmp.data)
+                cur = tmp
+
+    return cur
 
